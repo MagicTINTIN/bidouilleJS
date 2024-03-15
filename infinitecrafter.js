@@ -42,14 +42,15 @@ function isTestedAndAddIt(item1, item2) {
 }
 
 function addReceipe(res, item1, item2) {
-    if (!recipeBook[res])
+    if (!recipeBook[res]) {
+        window.newWordsPerRound += 1;
         recipeBook[res] = [[item1, item2]];
+    }
     else {
-        window.newWordsPerRound+=1;
-        console.log(`Putain de merde ${window.newWordsPerRound}`);
-
-        if (!isArrayInArray(recipeBook[res], item1, item2));
-        recipeBook[res].push([item1, item2]);
+        if (!isArrayInArray(recipeBook[res], item1, item2)) {
+            window.newWordsPerRound += 1;
+            recipeBook[res].push([item1, item2]);
+        }
     }
 }
 
@@ -73,7 +74,7 @@ async function fetchPageAndReturnJSON(url, timeout = 100) {
     }
 }
 
-function searchWords(numberOfAllCombinaisonsPerWord) {
+async function searchWords(numberOfAllCombinaisonsPerWord) {
     let totalWords = 0;
     for (let index = 0; index < numberOfAllCombinaisonsPerWord; index++) {
         let wordsToTest = [];
@@ -82,20 +83,25 @@ function searchWords(numberOfAllCombinaisonsPerWord) {
             wordsToTest.push(key);
         }
         for (const item1 of wordsToTest) {
+            if (window.break)
+                break;
             for (const item2 of wordsToTest) {
+                if (window.break)
+                    break;
                 if (!isTestedAndAddIt(item1, item2)) {
-                    setTimeout(() => {
-                        fetchPageAndReturnJSON(`https://neal.fun/api/infinite-craft/pair?first=${item1}&second=${item2}`)
-                            .then(jsonData => {
-                                //console.log('JSON data:', jsonData);
-                                if (jsonData.result != "Nothing" && jsonData.emoji != "") {
-                                    addReceipe(jsonData.result, item1, item2);
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                            });
-                    }, 100);
+                    if (window.break)
+                        break;
+                    await new Promise(resolve => setTimeout(resolve, window.timeBetweenRequests));
+                    fetchPageAndReturnJSON(`https://neal.fun/api/infinite-craft/pair?first=${item1}&second=${item2}`)
+                        .then(jsonData => {
+                            //console.log('JSON data:', jsonData);
+                            if (jsonData.result != "Nothing" && jsonData.emoji != "") {
+                                addReceipe(jsonData.result, item1, item2);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
                 }
             }
         }
@@ -126,3 +132,6 @@ function exportToCPP() {
     console.log(text);
     return text;
 }
+
+window.break = false;
+window.timeBetweenRequests = 500;
