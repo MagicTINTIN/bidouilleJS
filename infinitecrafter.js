@@ -13,6 +13,7 @@ recipeBook = {
 };
 
 tested = [];
+window.newWordsPerRound = 0;
 
 newWords = [];
 
@@ -44,9 +45,17 @@ function addReceipe(res, item1, item2) {
     if (!recipeBook[res])
         recipeBook[res] = [[item1, item2]];
     else {
+        window.newWordsPerRound+=1;
+        console.log(`Putain de merde ${window.newWordsPerRound}`);
+
         if (!isArrayInArray(recipeBook[res], item1, item2));
         recipeBook[res].push([item1, item2]);
     }
+}
+
+function increment() {
+    window.newWordsPerRound++;
+    console.log(`Nique ${window.newWordsPerRound}`);
 }
 
 
@@ -68,6 +77,7 @@ function searchWords(numberOfAllCombinaisonsPerWord) {
     let totalWords = 0;
     for (let index = 0; index < numberOfAllCombinaisonsPerWord; index++) {
         let wordsToTest = [];
+        window.newWordsPerRound = 0;
         for (const key in recipeBook) {
             wordsToTest.push(key);
         }
@@ -89,7 +99,10 @@ function searchWords(numberOfAllCombinaisonsPerWord) {
                 }
             }
         }
+        console.log(`Added ${window.newWordsPerRound} words in round ${index}`);
+        totalWords += window.newWordsPerRound;
     }
+    console.log(`Added ${totalWords} words$`);
 }
 
 function exportToCPP() {
