@@ -121,13 +121,14 @@ function exportToCPP() {
         let c = 1;
         for (const craft of item) {
             text += `{"${craft[0]}", "${craft[1]}"}`;
-            if (c < item.size)
+            if (c < item.length)
                 text += ",\n"
             c++;
         }
         text += `},__INT_MAX__}}`;
-        if (c < recipeBook.size)
+        if (i < Object.keys(recipeBook).length)
             text += ",\n";
+        i++;
     }
     console.log(text);
     return text;
